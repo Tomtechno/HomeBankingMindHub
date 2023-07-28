@@ -1,4 +1,7 @@
-﻿using System;
+﻿using HomeBankingMindHub.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections;
 using System.Linq;
 
 namespace HomeBankingMindHub.Models
@@ -18,17 +21,33 @@ namespace HomeBankingMindHub.Models
                     new Client { Email = "tomas@gmail.com", FirstName="Tomas", LastName="Uzquiano", Password="hae345b%"},
 
                 };
-
                 foreach (Client client in clients)
                 {
                     context.Clients.Add(client);
                 }
-
-                //guardamos
+            }
+            if (!context.Accounts.Any())
+            {
+                int NumberAcount = 1;
+                var clients = context.Clients.ToList();
+                foreach (Client client in clients)
+                {
+                    Random rnd = new Random();
+                    Account account = new Account
+                    {
+                        ClientId = client.Id,
+                        CreationDate = DateTime.Now,
+                        Number = "VIN00" + NumberAcount.ToString(),
+                        Balance = rnd.Next(1000, 50000)
+                    };
+                    context.Accounts.Add(account);
+                    NumberAcount++;
+                }
                 context.SaveChanges();
             }
-
         }
     }
-}
+ }
+
+
 
