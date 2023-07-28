@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HomeBankingMindHub.Models
 {
@@ -10,5 +11,6 @@ namespace HomeBankingMindHub.Models
         public double Balance { get; set; }
         public Client Client { get; set; }
         public long ClientId { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
     }
 }
