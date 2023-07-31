@@ -39,6 +39,14 @@ namespace HomeBankingMindHub.Controllers
                             Balance = ac.Balance,
                             CreationDate = ac.CreationDate,
                             Number = ac.Number
+                        }).ToList(),
+                        Loans = client.ClientLoans.Select(cl => new ClientLoanDTO
+                        {
+                            Id = cl.Id,
+                            LoanId = cl.LoanId,
+                            Name = cl.Loan.Name,
+                            Amount = cl.Amount,
+                            Payments = int.Parse(cl.Payments)
                         }).ToList()
                     };
                     clientsDTO.Add(newClientDTO);
@@ -51,15 +59,14 @@ namespace HomeBankingMindHub.Controllers
             }
         }
         [HttpGet("{id}")]
+
         public IActionResult Get(long id)
         {
             try
             {
                 var client = _clientRepository.FindById(id);
                 if (client == null)
-                {
-                    return NotFound();
-                }
+                { return NotFound(); }
                 var clientDTO = new ClientDTO
                 {
                     Id = client.Id,
@@ -72,7 +79,17 @@ namespace HomeBankingMindHub.Controllers
                         Balance = ac.Balance,
                         CreationDate = ac.CreationDate,
                         Number = ac.Number
-                    }).ToList()
+                    }).ToList(),
+                    Loans = client.ClientLoans.Select
+                        (cl => new ClientLoanDTO
+                        {
+                            Id = cl.Id,
+                            LoanId = cl.LoanId,
+                            Name = cl.Loan.Name,
+                            Amount = cl.Amount,
+                            Payments = int.Parse(cl.Payments)
+                        }
+                        ).ToList()
                 };
                 return Ok(clientDTO);
             }
@@ -80,6 +97,7 @@ namespace HomeBankingMindHub.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+
         }
     }
 }
