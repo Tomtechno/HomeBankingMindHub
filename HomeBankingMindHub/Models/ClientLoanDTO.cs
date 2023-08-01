@@ -7,6 +7,5 @@
         public int Payments { get; set; }
         public long LoanId { get; set; }
         public string Name { get; set; }
-
     }
 }
