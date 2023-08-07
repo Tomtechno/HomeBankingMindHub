@@ -31,13 +31,13 @@ namespace HomeBankingMindHub
                     logger.LogError(ex, "Ha ocurrido un error al enviar la info a la base de datos");
                 }
             }
-            host.Run();
+            host.Run(); // Comienza la aplicacion
         }
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) => // Es la aplicacion (thread) que es llamado con el host.run()
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>(); // Inicializa el Startup donde se setea todo lo importante
                 });
     }
 }
