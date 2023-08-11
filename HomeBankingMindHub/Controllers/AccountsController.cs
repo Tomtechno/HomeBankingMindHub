@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HomeBankingMindHub.Controllers
 {
@@ -14,9 +15,11 @@ namespace HomeBankingMindHub.Controllers
     public class AccountsController : ControllerBase
     {
         private IAccountRepository _accountRepository;
-        public AccountsController(IAccountRepository accountRepository)
+        private IClientRepository _clientRepository;
+        public AccountsController(IAccountRepository accountRepository, IClientRepository clientRepository)
         {
             _accountRepository = accountRepository;
+            _clientRepository = clientRepository;
         }
         [HttpGet]
         public IActionResult Get()
@@ -83,5 +86,33 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpPost]
+        public IActionResult Post(long clientId)
+        {
+            try
+            {
+                Account newAccount = new Account
+                {
+                    ClientId = clientId,
+                    CreationDate = DateTime.Now,
+                    Balance = 0,
+                    Number = "VIN-" + new Random().Next(100000,999999).ToString()
+                };
+                _accountRepository.Save(newAccount);
+                AccountDTO newAccountDto = new AccountDTO
+                {
+                    Id = newAccount.Id,
+                    Balance = newAccount.Balance,
+                    CreationDate = newAccount.CreationDate,
+                    Number = newAccount.Number
+                };
+                return Created("", newAccountDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
