@@ -21,6 +21,8 @@ namespace HomeBankingMindHub.Controllers
             _accountRepository = accountRepository;
             _clientRepository = clientRepository;
         }
+        //Los get son peticiones que se hace el front al baclk traves de un URL
+        //Los post son peticiones para enviar, modificar o guardar datos en el back
         [HttpGet]
         public IActionResult Get()
         {

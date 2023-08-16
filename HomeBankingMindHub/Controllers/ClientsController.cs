@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace HomeBankingMindHub.Controllers
 {  
@@ -179,23 +181,64 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpGet("current/accounts")]
+        public IActionResult GetAccounts()
+        {
+            try
+            {
+                string email = User.FindFirst("Client")?.Value;
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Forbid();
+                }
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return Forbid();
+                }
+                var accounts = client.Accounts;
+                return Ok(accounts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
         [HttpPost]
         public IActionResult Post([FromBody] Client client)
         {
             try
             {
-                //validamos datos antes
-                if (String.IsNullOrEmpty(client.Email) || String.IsNullOrEmpty(client.Password) || String.IsNullOrEmpty(client.FirstName) || String.IsNullOrEmpty(client.LastName))
-                    return StatusCode(403, "datos inválidos");
-
+                if (client.FirstName.Length <= 2 || client.LastName.Length <= 2)
+                {
+                    return StatusCode(400, "name and last name should have more than 3 letters");
+                }
+                if (!Regex.IsMatch(client.FirstName, @"^[a-zA-Z\s]+$"))
+                {
+                    return StatusCode(400, "name can't have special characters");
+                }
+                if (!Regex.IsMatch(client.LastName, @"^[a-zA-Z\s]+$"))
+                {
+                    return StatusCode(400, "name can't have special characters");
+                }
+                if (!(Regex.IsMatch(client.Email, @"^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$")))
+                {
+                    return StatusCode(400, "invalid email");
+                }
+                if (client.Password.Length < 8)
+                {
+                    return StatusCode(400, "password should be longer than 8");
+                }
+                if (!Regex.IsMatch(client.Password, @"^(?=.[a-z])(?=.[A-Z])(?=.*\d).+$"))
+                {
+                    return StatusCode(400, "password should have one upper case, one lower case and a number");
+                }
                 //buscamos si ya existe el usuario
                 Client user = _clientRepository.FindByEmail(client.Email);
-
-                if (user != null)
+                if (user == null)
                 {
                     return StatusCode(403, "Email está en uso");
                 }
-
                 Client newClient = new Client
                 {
                     Email = client.Email,
@@ -203,7 +246,6 @@ namespace HomeBankingMindHub.Controllers
                     FirstName = client.FirstName,
                     LastName = client.LastName,
                 };
-
                 _clientRepository.Save(newClient);
                 _accountsController.Post(newClient.Id);
                 return Created("", newClient);

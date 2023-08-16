@@ -33,11 +33,15 @@ namespace HomeBankingMindHub
             services.AddRazorPages(); //Permite utilizar páginas Razor (C#+html) en la aplicación (vistas)
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve); //Se agregan los controladores y permite que los controladores respondan a las peticiones http
             services.AddDbContext<HomeBankingContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("HomeBankingConnection"))); // Agregamos el contexto
-            services.AddScoped<IClientRepository, ClientRepository>(); // Agregamos el repositorio
-            services.AddScoped<IAccountRepository, AccountRepository>(); // Agregamos el repositorio
+            services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICardRepository, CardRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<AccountsController>();
+            services.AddScoped<AuthController>();
             services.AddScoped<CardsController>();
+            services.AddScoped<ClientsController>();
+            services.AddScoped<TransactionsController>();
             //autenticación, cuando el navegador envía una petición para acceder a algún recurso protegido el servidor web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) // It defines the process and rules for authentication
             .AddCookie(options =>
@@ -64,7 +68,7 @@ namespace HomeBankingMindHub
             }
             app.UseStaticFiles(); //Cuando se hace una request, responde utilizando los contenidos de la carpeta wwwroot
             app.UseRouting(); //Determina que endpoint debe responder a la request
-            app.UseAuthentication(); // 
+            app.UseAuthentication();
             app.UseAuthorization(); //Restrinje el acceso de acuerdo a los roles de cada usuario y la autentificacion
             app.UseEndpoints(endpoints => // Define las rutas finales que seran utilizadas para manejar las solicitudes entrantes
             {
