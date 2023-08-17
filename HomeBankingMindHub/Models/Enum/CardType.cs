@@ -1,4 +1,4 @@
-﻿namespace HomeBankingMindHub.Models
+﻿namespace HomeBankingMindHub.Models.Enum
 {
     public enum CardType
     {

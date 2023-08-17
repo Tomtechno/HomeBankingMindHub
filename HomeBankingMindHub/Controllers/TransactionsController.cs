@@ -1,5 +1,6 @@
-﻿using HomeBankingMindHub.dtos;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Models.DTO;
+using HomeBankingMindHub.Models.Enum;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

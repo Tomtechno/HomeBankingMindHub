@@ -37,11 +37,14 @@ namespace HomeBankingMindHub
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ICardRepository, CardRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<IClientLoanRepository, ClientLoanRepository>();
+            services.AddScoped<ILoanRepository, LoanRepository>();
             services.AddScoped<AccountsController>();
             services.AddScoped<AuthController>();
             services.AddScoped<CardsController>();
             services.AddScoped<ClientsController>();
             services.AddScoped<TransactionsController>();
+            services.AddScoped<LoansController>();
             //autenticación, cuando el navegador envía una petición para acceder a algún recurso protegido el servidor web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) // It defines the process and rules for authentication
             .AddCookie(options =>

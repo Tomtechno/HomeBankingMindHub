@@ -1,8 +1,8 @@
-﻿namespace HomeBankingMindHub.Models
+﻿namespace HomeBankingMindHub.Models.Enum
 {
     public enum LoanType
     {
-        Hipotecario,
+        Hipotecario = 0,
         Personal,
         Automotriz
     }

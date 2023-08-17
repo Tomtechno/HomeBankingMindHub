@@ -1,5 +1,6 @@
-﻿using HomeBankingMindHub.dtos;
-using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Models.DTO;
+using HomeBankingMindHub.Models.Enum;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +12,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace HomeBankingMindHub.Controllers
-{  
+{
     [Route("api/[controller]")]
     [ApiController]  
     public class ClientsController : ControllerBase

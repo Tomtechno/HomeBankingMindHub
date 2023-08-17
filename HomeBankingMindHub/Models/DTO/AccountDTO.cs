@@ -1,8 +1,7 @@
-﻿using HomeBankingMindHub.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace HomeBankingMindHub.dtos
+namespace HomeBankingMindHub.Models.DTO
 {
     public class AccountDTO
     {

@@ -1,4 +1,4 @@
-﻿using HomeBankingMindHub.Models;
+﻿using HomeBankingMindHub.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
@@ -19,13 +19,11 @@ namespace HomeBankingMindHub.Models
                     new Client { Email = "eren@gmail.com", FirstName="Eren", LastName="Jaeger", Password="Pasfd#a2"},
                     new Client { Email = "mikasa12@gmail.com", FirstName="Mikasa", LastName="Ackerman", Password="o2314nnsaA%"},
                     new Client { Email = "tomas@gmail.com", FirstName="Tomas", LastName="Uzquiano", Password="hae345b%"},
-
                 };
                 foreach (Client client in clients)
                 {
                     context.Clients.Add(client);
-                }
-                context.SaveChanges();
+                }             
             }
             if (!context.Accounts.Any())
             {
@@ -44,7 +42,6 @@ namespace HomeBankingMindHub.Models
                     context.Accounts.Add(account);
                     NumberAcount++;
                 }
-                context.SaveChanges();
             }
             if (!context.Transactions.Any())
             {
@@ -62,7 +59,6 @@ namespace HomeBankingMindHub.Models
                         context.Transactions.Add(transaction);
                     }
                 }
-                context.SaveChanges();
             }
             if (!context.Loans.Any())
             {
@@ -121,7 +117,6 @@ namespace HomeBankingMindHub.Models
                         context.ClientLoans.Add(clientLoan3);
                     }
                     //guardamos todos los prestamos
-                    context.SaveChanges();
                 }
             }
             if (!context.Cards.Any())
@@ -159,8 +154,8 @@ namespace HomeBankingMindHub.Models
                         context.Cards.Add(card);
                     }                
                 }
-                context.SaveChanges();
             }
+            context.SaveChanges();
         }
     }
  }

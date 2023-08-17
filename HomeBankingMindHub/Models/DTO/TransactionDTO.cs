@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HomeBankingMindHub.Models
+namespace HomeBankingMindHub.Models.DTO
 {
     public class TransactionDTO
     {
