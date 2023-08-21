@@ -68,6 +68,10 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return StatusCode(403, "La cuenta destino no existe");
                 }
+                if (account.ClientId != client.Id)
+                {
+                    return StatusCode(403, "La cuenta destino no pertenece al cliente");
+                }
                 var acc = client.Accounts.Where(acc => acc.Number == account.Number).FirstOrDefault();
                 if (acc == null)
                 {

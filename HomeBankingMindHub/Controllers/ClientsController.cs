@@ -351,12 +351,6 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return StatusCode(403, "Ha alcanzado la cantidad limite de tarjetas, ya tiene 3 tarjetas del mismo tipo");
                 }
-
-
-
-
-
-
                 int sameCard = client.Cards.Where(c => c.Color == card.Color && c.Type == card.Type).Count();
                 if (sameCard == 1)
                 {
