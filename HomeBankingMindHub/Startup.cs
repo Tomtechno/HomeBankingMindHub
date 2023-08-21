@@ -1,6 +1,7 @@
 using HomeBankingMindHub.Controllers;
 using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Interfaces;
 using HomeBankingMinHub.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -24,6 +25,7 @@ namespace HomeBankingMindHub
         {
             Configuration = configuration;
         }
+
         public IConfiguration Configuration { get; }
         // This method gets called by the runtime. Use this method to add services to the container.
 
@@ -58,6 +60,7 @@ namespace HomeBankingMindHub
                 options.AddPolicy("ClientOnly", policy => policy.RequireClaim("Client")); // Se indica que se demanda un Client, cuando se le hace una peticion al back, el back nos demandarpa tener Client
             });
         }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -76,8 +79,8 @@ namespace HomeBankingMindHub
             app.UseEndpoints(endpoints => // Define las rutas finales que seran utilizadas para manejar las solicitudes entrantes
             {
                 // Los endpoint refieren a URLs que por el cual el usuario hace una peticion y asi puede interactuar con la web
-                endpoints.MapRazorPages(); //Para utilizar el front end al llamar algunos (.css) urls de html
-                endpoints.MapControllers(); //Establece una ruta para manejar las solicitudes a controladores quientes responden a la solicitudes http
+                endpoints.MapRazorPages(); //Para cada endpoint mapea el razorpages, tecnologia de ASP para construir paginas web utilizando c#
+                endpoints.MapControllers(); //Establece una ruta para manejar las solicitudes a controladores quientes responden a la solicitudes http, permite usar los controladores
                 //endpoints.MapControllerRoute( Used for configuring routes for traditional MVC controllers while MapControllers is for Web API controllers
                 //    name: "default",
                 //    pattern: "{controller=games}/{ action = Get}");

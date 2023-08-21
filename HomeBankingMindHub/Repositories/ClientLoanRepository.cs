@@ -1,4 +1,5 @@
 ﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace HomeBankingMindHub.Repositories
         public ClientLoanRepository(HomeBankingContext repositoryContext) : base(repositoryContext)
         {
         }
+
         public void Save(ClientLoan clientLoan)
         {
             Create(clientLoan);

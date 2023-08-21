@@ -1,7 +1,7 @@
 ﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Models.DTO;
 using HomeBankingMindHub.Models.Enum;
-using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -14,9 +14,11 @@ namespace HomeBankingMindHub.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
+
         private IClientRepository _clientRepository;
         private IAccountRepository _accountRepository;
         private ITransactionRepository _transactionRepository;
+
 
         public TransactionsController(IClientRepository clientRepository, IAccountRepository accountRepository, ITransactionRepository transactionRepository)
         {
@@ -24,6 +26,7 @@ namespace HomeBankingMindHub.Controllers
             _accountRepository = accountRepository;
             _transactionRepository = transactionRepository;
         }
+
         [HttpPost]
         public IActionResult Post([FromBody] TransferDTO transferDTO)
         {
@@ -32,24 +35,24 @@ namespace HomeBankingMindHub.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return Forbid("Email vacio");
+                    return Forbid();
                 }
                 Client client = _clientRepository.FindByEmail(email);
                 if (client == null)
                 {
-                    return Forbid("No existe el cliente");
+                    return Forbid();
                 }
                 if (transferDTO.FromAccountNumber == string.Empty || transferDTO.ToAccountNumber == string.Empty)
                 {
-                    return Forbid("Cuenta de origen o cuenta de destino no proporcionada.");
+                    return Forbid("Cuenta de origen o cuenta de destino no proporcionada");
                 }
                 if (transferDTO.FromAccountNumber == transferDTO.ToAccountNumber)
                 {
-                    return Forbid("No se permite la transferencia a la misma cuenta.");
+                    return Forbid("No se permite la transferencia a la misma cuenta");
                 }
                 if (transferDTO.Amount == 0 || transferDTO.Description == string.Empty)
                 {
-                    return Forbid("Monto o descripcion no proporcionados.");
+                    return Forbid("Monto o descripcion no proporcionados");
                 }
                 //buscamos las cuentas
                 Account fromAccount = _accountRepository.FindByNumber(transferDTO.FromAccountNumber);
@@ -103,5 +106,6 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }

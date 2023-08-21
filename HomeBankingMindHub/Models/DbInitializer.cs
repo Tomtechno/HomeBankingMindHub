@@ -23,7 +23,7 @@ namespace HomeBankingMindHub.Models
                 foreach (Client client in clients)
                 {
                     context.Clients.Add(client);
-                }             
+                }
             }
             if (!context.Accounts.Any())
             {
@@ -152,13 +152,13 @@ namespace HomeBankingMindHub.Models
                     foreach (Card card in cards)
                     {
                         context.Cards.Add(card);
-                    }                
+                    }
                 }
             }
             context.SaveChanges();
         }
     }
- }
+}
 
 
 

@@ -1,10 +1,12 @@
 ﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Models.DTO;
 using HomeBankingMindHub.Models.Enum;
-using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Interfaces;
+using HomeBankingMinHub.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,18 +16,24 @@ using System.Xml.Linq;
 namespace HomeBankingMindHub.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]  
+    [ApiController]
     public class ClientsController : ControllerBase
     {
+
         private IClientRepository _clientRepository;
+        private ICardRepository _cardRepository;
         private AccountsController _accountsController;
         private CardsController _cardsController;
-        public ClientsController(IClientRepository clientRepository, AccountsController accountController, CardsController cardController)
+
+        public ClientsController(IClientRepository clientRepository, ICardRepository cardRepository, AccountsController accountController, CardsController cardController)
         {
             _clientRepository = clientRepository;
+            _cardRepository = cardRepository;
             _accountsController = accountController;
             _cardsController = cardController;
+
         }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -77,6 +85,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpGet("{id}")]
         public IActionResult Get(long id)
         {
@@ -127,6 +136,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpGet("current")]
         public IActionResult GetCurrent()
         {
@@ -182,6 +192,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpGet("current/accounts")]
         public IActionResult GetAccounts()
         {
@@ -205,6 +216,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost]
         public IActionResult Post([FromBody] Client client)
         {
@@ -212,33 +224,32 @@ namespace HomeBankingMindHub.Controllers
             {
                 if (client.FirstName.Length <= 2 || client.LastName.Length <= 2)
                 {
-                    return StatusCode(400, "name and last name should have more than 3 letters");
+                    return StatusCode(403, "El nombre y el apellido deben tener al menos tres caracteres");
                 }
                 if (!Regex.IsMatch(client.FirstName, @"^[a-zA-Z\s]+$"))
                 {
-                    return StatusCode(400, "name can't have special characters");
+                    return StatusCode(403, "El nombre no puede tener caracteres especiales");
                 }
                 if (!Regex.IsMatch(client.LastName, @"^[a-zA-Z\s]+$"))
                 {
-                    return StatusCode(400, "name can't have special characters");
+                    return StatusCode(403, "El apellido no puede tener caracteres especiales");
                 }
-                if (!(Regex.IsMatch(client.Email, @"^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$")))
+                if (!(Regex.IsMatch(client.Email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$")))
                 {
-                    return StatusCode(400, "invalid email");
+                    return StatusCode(403, "El email es invalido");
                 }
-                if (client.Password.Length < 8)
+                if (client.Password.Length <= 7)
                 {
-                    return StatusCode(400, "password should be longer than 8");
+                    return StatusCode(403, "La contrasenia debe tener al menos 8 caracteres");
                 }
-                if (!Regex.IsMatch(client.Password, @"^(?=.[a-z])(?=.[A-Z])(?=.*\d).+$"))
+                if (!(Regex.IsMatch(client.Password, "[A-Z]") && Regex.IsMatch(client.Password, "[a-z]") && Regex.IsMatch(client.Password, "[a-z]")))
                 {
-                    return StatusCode(400, "password should have one upper case, one lower case and a number");
+                    return StatusCode(403, "La contrasenia debe contener al menos 1 mayuscula, 1 minuscula y 1 numero");
                 }
-                //buscamos si ya existe el usuario
                 Client user = _clientRepository.FindByEmail(client.Email);
                 if (user == null)
                 {
-                    return StatusCode(403, "Email está en uso");
+                    return StatusCode(403, "El email está en uso");
                 }
                 Client newClient = new Client
                 {
@@ -249,13 +260,14 @@ namespace HomeBankingMindHub.Controllers
                 };
                 _clientRepository.Save(newClient);
                 _accountsController.Post(newClient.Id);
-                return Created("", newClient);
+                return Created("Creado con exito", newClient);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost("current/accounts")]
         public IActionResult PostAccounts()
         {
@@ -271,22 +283,23 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return Forbid();
                 }
-                if (client.Accounts.Count > 2)
+                if (client.Accounts.Count >= 3)
                 {
-                    return StatusCode(403, "Usted ya tiene mas de 3 cuentas");
+                    return StatusCode(403, "Ha alcanzado la cantidad maxima de cuentas, usted ya tiene 3 cuentas");
                 }
-                var account = _accountsController.Post(client.Id); //creamos lacuenta 
+                var account = _accountsController.Post(client.Id);
                 if (account == null)
                 {
                     return StatusCode(500, "Error al crear la cuenta");
                 }
-                return Created("", account);
+                return Created("Creado con exito", account);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost("current/cards")]
         public IActionResult PostCards([FromBody] Card card)
         {
@@ -295,18 +308,25 @@ namespace HomeBankingMindHub.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return NotFound();
+                    return Forbid();
                 }
                 Client client = _clientRepository.FindByEmail(email);
+                var digits1 = new Random().Next(1000, 9999);
+                var digits2 = new Random().Next(1000, 9999);
+                var digits3 = new Random().Next(1000, 9999);
+                var digits4 = new Random().Next(1000, 9999);
+                string newCardNumber;
+                do
+                {
+                    newCardNumber = digits1.ToString() + "-" + digits2.ToString() + "-" + digits3.ToString() + "-" + digits4.ToString();
+                }
+                while (_cardRepository.FindById(newCardNumber) != null);
                 Card newCard = new Card
                 {
                     CardHolder = client.FirstName + " " + client.LastName,
                     Type = card.Type,
                     Color = card.Color,
-                    Number = new Random().Next(1000, 9999).ToString() + ("-") +
-                    new Random().Next(1000, 9999).ToString() + ("-") +
-                    new Random().Next(1000, 9999).ToString() + ("-") +
-                    new Random().Next(1000, 9999).ToString(),
+                    Number = newCardNumber,
                     Cvv = new Random().Next(100, 999),
                     FromDate = DateTime.Now,
                     ThruDate = DateTime.Now.AddYears(4),
@@ -314,16 +334,16 @@ namespace HomeBankingMindHub.Controllers
                 };
                 if (card.Type != CardType.CREDIT.ToString() && card.Type != CardType.DEBIT.ToString())
                 {
-                    return BadRequest("El tipo de tarjeta no es valido");
+                    return StatusCode(400, "El tipo de tarjeta es invalido");
                 }
                 if (card.Color != CardColor.GOLD.ToString() && card.Color != CardColor.SILVER.ToString() && card.Type != CardColor.SILVER.ToString())
                 {
-                    return BadRequest("El color de tarjeta no es valido");
+                    return StatusCode(400, "El color de tarjeta es invalido");
                 }
                 int CardCount = client.Cards.Where(c => c.Type == card.Type).Count();
-                if (CardCount > 2)
+                if (CardCount >= 3)
                 {
-                    return StatusCode(403, "Ya tiene 3 tarjetas del mismo tipo");
+                    return StatusCode(403, "Ha alcanzado la cantidad limite de tarjetas, ya tiene 3 tarjetas del mismo tipo");
                 }
                 int sameCard = client.Cards.Where(c => card.Color == card.Color && c.Type == card.Type).Count();
                 if (sameCard == 1)
@@ -335,12 +355,13 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return StatusCode(500, "Error al crear la tarjeta");
                 }
-                return Created("", newCardDto);
+                return Created("Creado con exito", newCardDto);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }

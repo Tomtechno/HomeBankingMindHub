@@ -1,14 +1,14 @@
-﻿using HomeBankingMindHub.Repositories;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System;
-using HomeBankingMindHub.Models;
 
 namespace HomeBankingMindHub.Controllers
 {
@@ -16,11 +16,14 @@ namespace HomeBankingMindHub.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+
         private IClientRepository _clientRepository;
+
         public AuthController(IClientRepository clientRepository)
         {
             _clientRepository = clientRepository;
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] Client client)
         {
@@ -35,10 +38,10 @@ namespace HomeBankingMindHub.Controllers
                 };
                 var claimsIdentity = new ClaimsIdentity( // Es propio de cada usuario y tiene una lista con sus claims. Representa a un usuario autenticado
                     claims,
-                    CookieAuthenticationDefaults.AuthenticationScheme 
+                    CookieAuthenticationDefaults.AuthenticationScheme
                     );
                 await HttpContext.SignInAsync( // Le pasamos todos los datos que configuramos con la identidad de la persona para que cree la cookie la mande al navegador y la persona cuando se loguee
-                    // y cada vez que la persona hace una peticion al back esa cookie tambien viaja
+                                               // y cada vez que la persona hace una peticion al back esa cookie tambien viaja
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
                 return Ok();
@@ -48,6 +51,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -62,5 +66,6 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }

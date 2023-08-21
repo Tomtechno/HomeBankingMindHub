@@ -1,12 +1,12 @@
 ﻿using HomeBankingMindHub.Models;
-using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Models.DTO;
+using HomeBankingMindHub.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using HomeBankingMindHub.Models.DTO;
 
 namespace HomeBankingMindHub.Controllers
 {
@@ -14,15 +14,16 @@ namespace HomeBankingMindHub.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
+
         private IAccountRepository _accountRepository;
         private IClientRepository _clientRepository;
+
         public AccountsController(IAccountRepository accountRepository, IClientRepository clientRepository)
         {
             _accountRepository = accountRepository;
             _clientRepository = clientRepository;
         }
-        //Los get son peticiones que se hace el front al baclk traves de un URL
-        //Los post son peticiones para enviar, modificar o guardar datos en el back
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -56,6 +57,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpGet("{id}")]
         public IActionResult Get(long id)
         {
@@ -88,6 +90,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpPost]
         public IActionResult Post(long clientId)
         {
@@ -98,7 +101,7 @@ namespace HomeBankingMindHub.Controllers
                     ClientId = clientId,
                     CreationDate = DateTime.Now,
                     Balance = 0,
-                    Number = "VIN-" + new Random().Next(100000,999999).ToString()
+                    Number = "VIN-" + new Random().Next(100000, 999999).ToString()
                 };
                 _accountRepository.Save(newAccount);
                 AccountDTO newAccountDto = new AccountDTO
@@ -108,7 +111,7 @@ namespace HomeBankingMindHub.Controllers
                     CreationDate = newAccount.CreationDate,
                     Number = newAccount.Number
                 };
-                return Created("", newAccountDto);
+                return Created("Creado con exito", newAccountDto);
             }
             catch (Exception ex)
             {

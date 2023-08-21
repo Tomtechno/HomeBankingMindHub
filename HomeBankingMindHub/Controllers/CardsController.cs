@@ -1,21 +1,26 @@
 ﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Models.DTO;
-using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Differencing;
 using System;
 using System.Drawing;
 
 namespace HomeBankingMindHub.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]   
-    public class CardsController : ControllerBase {
+    [ApiController]
+    public class CardsController : ControllerBase
+    {
+
         private ICardRepository _cardRepository;
+
         public CardsController(ICardRepository cardRepository)
         {
             _cardRepository = cardRepository;
         }
+
         public IActionResult Post(Card newCard)
         {
             try
@@ -31,12 +36,13 @@ namespace HomeBankingMindHub.Controllers
                     FromDate = newCard.FromDate,
                     ThruDate = newCard.ThruDate,
                 };
-                return Created("", newcardDTO);
+                return Created("Creado con exito", newcardDTO);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }

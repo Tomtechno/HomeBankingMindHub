@@ -1,7 +1,7 @@
 ﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Models.DTO;
 using HomeBankingMindHub.Models.Enum;
-using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,11 +14,13 @@ namespace HomeBankingMindHub.Controllers
     [ApiController]
     public class LoansController : ControllerBase
     {
+
         private IClientRepository _clientRepository;
         private IAccountRepository _accountRepository;
         private ILoanRepository _loanRepository;
         private IClientLoanRepository _clientLoanRepository;
         private ITransactionRepository _transactionRepository;
+
         public LoansController(IClientRepository clientRepository, IAccountRepository accountRepository, ILoanRepository loanRepository, IClientLoanRepository clientLoanRepository, ITransactionRepository transactionRepository)
         {
             _clientRepository = clientRepository;
@@ -27,6 +29,7 @@ namespace HomeBankingMindHub.Controllers
             _clientLoanRepository = clientLoanRepository;
             _transactionRepository = transactionRepository;
         }
+
         [HttpPost]
         public IActionResult Post([FromBody] LoanApplicationDTO loanApplicationDTO)
         {
@@ -35,40 +38,40 @@ namespace HomeBankingMindHub.Controllers
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty)
                 {
-                    return BadRequest();
+                    return Forbid();
                 }
                 Client client = _clientRepository.FindByEmail(email);
                 if (client == null)
                 {
-                    return NotFound();
+                    return Forbid();
                 }
                 var loan = _loanRepository.FindById(loanApplicationDTO.LoanId);
                 if (loan == null)
                 {
-                    return NotFound();
+                    return StatusCode(403, "El prestamo no existe");
                 }
                 if (string.IsNullOrEmpty(loanApplicationDTO.Payments) || loanApplicationDTO.Amount <= 0 || string.IsNullOrEmpty(loanApplicationDTO.ToAccountNumber) || loanApplicationDTO.Payments == "0")
                 {
-                    return BadRequest("Por favor complete todos los campos");
+                    return StatusCode(403, "Por favor complete todos los campos");
                 }
                 if (loanApplicationDTO.Amount > loan.MaxAmount)
                 {
-                    return BadRequest("El monto excede el maximo");
+                    return StatusCode(403, "El monto solicitado supera el monto maximo permitido del prestamo solicitado");
                 }
                 var paymentList = loan.Payments.Split(',');
                 if (!paymentList.Contains(loanApplicationDTO.Payments))
                 {
-                    return BadRequest("Error en las cuotas solicitadas");
+                    return StatusCode(403, "La cantidad de cuotas no esta disponible para el prestamo solicitado");
                 }
                 var account = _accountRepository.FindByNumber(loanApplicationDTO.ToAccountNumber);
                 if (account == null)
                 {
-                    return Forbid();
+                    return StatusCode(403, "La cuenta destino no existe");
                 }
                 var acc = client.Accounts.Where(acc => acc.Number == account.Number).FirstOrDefault();
                 if (acc == null)
                 {
-                    return BadRequest("Las cuentas no coinciden");
+                    return StatusCode(403, "Las cuentas no coinciden");
                 }
                 account.Balance += loanApplicationDTO.Amount;
                 _accountRepository.Save(account);
@@ -96,6 +99,7 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -121,5 +125,6 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
     }
 }
