@@ -72,11 +72,6 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return StatusCode(403, "La cuenta destino no pertenece al cliente");
                 }
-                var acc = client.Accounts.Where(acc => acc.Number == account.Number).FirstOrDefault();
-                if (acc == null)
-                {
-                    return StatusCode(403, "Las cuentas no coinciden");
-                }
                 account.Balance += loanApplicationDTO.Amount;
                 _accountRepository.Save(account);
                 Transaction transaction = new Transaction
