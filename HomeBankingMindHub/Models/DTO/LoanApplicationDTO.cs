@@ -1,4 +1,7 @@
-﻿namespace HomeBankingMindHub.Models.DTO
+﻿using System.ComponentModel.DataAnnotations;
+using Xunit.Sdk;
+
+namespace HomeBankingMindHub.Models.DTO
 {
     public class LoanApplicationDTO
     {

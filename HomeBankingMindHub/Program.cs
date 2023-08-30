@@ -34,7 +34,7 @@ namespace HomeBankingMindHub
             host.Run(); // Comienza la aplicacion
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) => // Es la aplicacion (thread) que es llamado con el host.run()
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

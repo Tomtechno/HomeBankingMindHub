@@ -45,10 +45,6 @@ namespace HomeBankingMindHub.Controllers
                 {
                     return Forbid();
                 }
-                //if (string.IsNullOrEmpty(loanApplicationDTO.LoanId.ToString()))
-                //{
-                //    return StatusCode(403, "El prestamo no existe");
-                //}
                 var loan = _loanRepository.FindById(loanApplicationDTO.LoanId);
                 if (loan == null)
                 {

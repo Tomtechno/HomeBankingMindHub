@@ -16,7 +16,7 @@ var app = new Vue({
         getData: function(){
             Promise.all([axios.get("/api/loans"),axios.get("/api/clients/current/accounts")])
             .then((response) => {
-                //get loan types ifo
+                //get loan types info
                 this.loanTypes = response[0].data.$values;
                 this.clientAccounts = response[1].data.$values;
             })
@@ -63,7 +63,7 @@ var app = new Vue({
             this.paymentsList = this.loanTypes.find(loanType => loanType.id == this.loanTypeId).payments.split(',');
         },
         finish: function(){
-            window.location.reload();
+            window.location.href = './accounts.html'
         },
         checkFees: function(){
             this.fees = [];

@@ -90,6 +90,45 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        //[HttpGet()]
+        //public IActionResult GetByClient(long id)
+        //{
+        //    try
+        //    {
+        //        var accounts = _accountRepository.GetAccountsByClient(id);
+        //        if (accounts == null)
+        //        {
+        //            return Forbid();
+        //        }
+        //        var accountsDTO = new List<AccountDTO>();
+        //        foreach (Account account in accounts)
+        //        {
+        //            var accountDTO = new AccountDTO
+        //            {
+        //                Id = account.Id,
+        //                Number = account.Number,
+        //                CreationDate = account.CreationDate,
+        //                Balance = account.Balance,
+
+        //                Transactions = account.Transactions.Select(t => new TransactionDTO
+        //                {
+        //                    Id = t.Id,
+        //                    Date = t.Date,
+        //                    Type = t.Type,
+        //                    Amount = t.Amount,
+
+        //                }).ToList()
+
+        //            };
+        //            accountsDTO.Add(accountDTO);
+        //        }
+        //        return Ok(accountsDTO);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ex.Message);
+        //    }
+        //}
 
         [HttpPost]
         public IActionResult Post(long clientId)
